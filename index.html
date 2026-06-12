@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BMW Motorrad — Captura de Lead</title>
+<style>
+  :root {
+    --bmw-blue: #1c69d4;
+    --bmw-dark: #0a1628;
+    --bmw-mid: #1a3a6b;
+    --surface: #ffffff;
+    --surface-2: #f5f7fa;
+    --surface-3: #eef1f7;
+    --border: rgba(0,0,0,0.10);
+    --border-strong: rgba(0,0,0,0.18);
+    --text: #0f1923;
+    --text-2: #4a5568;
+    --text-3: #8a9ab0;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #dc2626;
+    --red-bg: #fee2e2;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--surface-2);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--bmw-dark);
+    padding: 16px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .bmw-logo {
+    width: 36px; height: 36px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .bmw-logo svg { width: 26px; height: 26px; }
+  .header-title { color: white; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; line-height: 1.2; }
+  .header-sub { color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 400; }
+  .lead-counter {
+    background: var(--bmw-blue);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .lead-counter:hover { opacity: 0.85; }
+
+  /* ── MAIN ── */
+  .main { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+  /* ── STATUS BAR ── */
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    font-size: 13px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    min-height: 42px;
+    transition: all 0.2s;
+  }
+  .status-bar.listening { background: #e8f0fd; border-color: #93b4f0; color: var(--bmw-blue); }
+  .status-bar.ok { background: var(--green-bg); border-color: #86efac; color: var(--green); }
+  .status-bar.error { background: var(--red-bg); border-color: #fca5a5; color: var(--red); }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    background: var(--text-3);
+    transition: background 0.2s;
+  }
+  .status-bar.listening .status-dot { background: var(--bmw-blue); animation: blink 0.8s infinite; }
+  .status-bar.ok .status-dot { background: var(--green); }
+  .status-bar.error .status-dot { background: var(--red); }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 18px 16px;
+    margin-bottom: 12px;
+  }
+
+  /* ── FIELD ── */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .field-label .req { color: var(--red); font-size: 13px; }
+  .field-row { display: flex; gap: 8px; align-items: stretch; }
+  .field-display {
+    flex: 1;
+    min-height: 44px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface-2);
+    display: flex; align-items: center;
+    cursor: text;
+    word-break: break-all;
+    transition: border-color 0.15s;
+  }
+  .field-display.empty { color: var(--text-3); font-style: italic; font-size: 13px; }
+  .field-display.filled { background: white; border-color: var(--border-strong); color: var(--text); }
+  .field-display[contenteditable="true"] { outline: none; border-color: var(--bmw-blue); background: white; }
+
+  /* ── MIC BUTTON ── */
+  .mic-btn {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+  .mic-btn:active { transform: scale(0.93); }
+  .mic-btn svg { width: 20px; height: 20px; stroke: var(--text-2); fill: none; stroke-width: 1.8; stroke-linecap: round; }
+  .mic-btn.listening { background: var(--red-bg); border-color: var(--red); }
+  .mic-btn.listening svg { stroke: var(--red); }
+  .mic-btn.done { background: var(--green-bg); border-color: var(--green); }
+  .mic-btn.done svg { stroke: var(--green); }
+
+  /* ── TRANSCRIPT BOX ── */
+  .transcript-box {
+    margin-top: 6px;
+    padding: 8px 11px;
+    border-radius: var(--radius-sm);
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    font-size: 12px;
+    color: #92400e;
+    display: none;
+    line-height: 1.5;
+  }
+  .transcript-box.show { display: block; }
+  .transcript-label { font-weight: 600; font-size: 11px; letter-spacing: 0.4px; margin-bottom: 3px; text-transform: uppercase; }
+
+  /* ── SECTION LABEL ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+
+  /* ── CHIPS ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+  .chip {
+    padding: 7px 13px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text-2);
+    background: white;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    white-space: nowrap;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.selected { background: var(--bmw-blue); color: white; border-color: var(--bmw-blue); font-weight: 500; }
+
+  /* ── CONCESSION LIST ── */
+  .concession-list { display: flex; flex-direction: column; gap: 7px; margin-top: 6px; }
+  .concession-item {
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    background: white;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    text-align: left;
+    width: 100%;
+  }
+  .concession-item:active { transform: scale(0.98); }
+  .concession-item.selected { background: var(--bmw-blue); border-color: var(--bmw-blue); }
+  .concession-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .concession-item.selected .concession-name { color: white; }
+  .concession-addr { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+  .concession-item.selected .concession-addr { color: rgba(255,255,255,0.7); }
+
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--bmw-blue);
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    margin-top: 4px;
+    letter-spacing: 0.3px;
+  }
+  .submit-btn:disabled { background: #c0cfe8; cursor: not-allowed; }
+  .submit-btn:not(:disabled):active { transform: scale(0.98); background: #1558b0; }
+
+  /* ── SUCCESS ── */
+  #successView {
+    display: none;
+    padding: 40px 20px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .success-icon {
+    width: 72px; height: 72px;
+    background: var(--green-bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .success-icon svg { width: 36px; height: 36px; stroke: var(--green); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .success-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .success-sub { font-size: 14px; color: var(--text-2); margin-bottom: 6px; }
+  .success-meta { font-size: 12px; color: var(--text-3); margin-bottom: 28px; }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-ghost {
+    flex: 1; padding: 13px; border: 1px solid var(--border-strong); border-radius: var(--radius);
+    background: white; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text-2);
+    -webkit-appearance: none;
+  }
+  .btn-primary {
+    flex: 1; padding: 13px; border: none; border-radius: var(--radius);
+    background: var(--bmw-blue); color: white; font-size: 14px; font-weight: 600; cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  /* ── LEADS VIEW ── */
+  #leadsView {
+    display: none;
+    padding: 0 0 24px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .leads-header {
+    padding: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: white;
+    position: sticky; top: 64px; z-index: 50;
+  }
+  .leads-header-title { font-size: 15px; font-weight: 600; }
+  .leads-header-count { font-size: 13px; color: var(--text-3); }
+  .export-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 16px;
+    border: 1px solid var(--bmw-blue);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--bmw-blue);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .export-btn svg { width: 16px; height: 16px; stroke: var(--bmw-blue); fill: none; stroke-width: 2; stroke-linecap: round; }
+  .lead-card {
+    margin: 10px 16px 0;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 15px;
+  }
+  .lead-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+  .lead-card-name { font-size: 15px; font-weight: 600; }
+  .lead-card-time { font-size: 11px; color: var(--text-3); }
+  .lead-card-row { font-size: 13px; color: var(--text-2); margin-bottom: 3px; display: flex; gap: 6px; }
+  .lead-card-row span:first-child { color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; width: 56px; flex-shrink: 0; padding-top: 1px; }
+  .lead-tag {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #e8f0fd;
+    color: var(--bmw-blue);
+  }
+  .empty-leads {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-3);
+    font-size: 14px;
+  }
+  .back-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--text-2);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  /* ── OUTROS MODELO ── */
+  .outro-input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface-2);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .outro-input:focus { border-color: var(--bmw-blue); background: white; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-left">
+    <div class="bmw-logo">
+      <svg viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="13" cy="13" r="12" fill="#1c69d4"/>
+        <circle cx="13" cy="13" r="12" fill="none" stroke="white" stroke-width="1.2"/>
+        <circle cx="13" cy="13" r="8" fill="none" stroke="white" stroke-width="0.8"/>
+        <path d="M13 5 L13 13 L20.6 13" fill="white" opacity="0.9"/>
+        <path d="M13 5 A8 8 0 0 1 20.6 13" fill="#1c69d4"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">BMW MOTORRAD</div>
+      <div class="header-sub">Captura de lead — evento</div>
+    </div>
+  </div>
+  <button class="lead-counter" onclick="showLeads()" id="counterBtn">0 leads</button>
+</header>
+
+<!-- FORM VIEW -->
+<div id="formView">
+<div class="main">
+
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot"></div>
+    <span id="statusText">Toque no microfone ao lado de cada campo para preencher por voz</span>
+  </div>
+
+  <!-- DADOS PESSOAIS -->
+  <p class="section-title">Dados do cliente</p>
+  <div class="card">
+
+    <div class="field">
+      <div class="field-label">Nome completo <span class="req">*</span></div>
+      <div class="field-row">
+        <div class="field-display empty" id="disp-nome" onclick="editField('nome')" title="Toque para editar">Nome completo</div>
+        <button class="mic-btn" id="mic-nome" onclick="startListen('nome')" aria-label="Gravar nome">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+      <div class="transcript-box" id="trans-nome"><div class="transcript-label">Transcrição</div><span id="trans-nome-text"></span></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">E-mail <span class="req">*</span></div>
+      <div class="field-row">
+        <div class="field-display empty" id="disp-email" onclick="editField('email')" title="Toque para editar">E-mail</div>
+        <button class="mic-btn" id="mic-email" onclick="startListen('email')" aria-label="Gravar email">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+      <div class="transcript-box" id="trans-email"><div class="transcript-label">Transcrição</div><span id="trans-email-text"></span></div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Celular <span class="req">*</span></div>
+      <div class="field-row">
+        <div class="field-display empty" id="disp-celular" onclick="editField('celular')" title="Toque para editar">Celular com DDD</div>
+        <button class="mic-btn" id="mic-celular" onclick="startListen('celular')" aria-label="Gravar celular">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+      <div class="transcript-box" id="trans-celular"><div class="transcript-label">Transcrição</div><span id="trans-celular-text"></span></div>
+    </div>
+
+  </div>
+
+  <!-- MODELO -->
+  <p class="section-title">Moto de interesse</p>
+  <div class="card">
+    <div class="field">
+      <div class="field-label">Selecione o modelo <span class="req">*</span></div>
+      <div class="chips" id="chips-modelo">
+        <button class="chip" onclick="selectChip('modelo',this,'R 1300 GS')">R 1300 GS</button>
+        <button class="chip" onclick="selectChip('modelo',this,'R 1300 GS Adventure')">R 1300 GS Adventure</button>
+        <button class="chip" onclick="selectChip('modelo',this,'F 900 R')">F 900 R</button>
+        <button class="chip" onclick="selectChip('modelo',this,'F 900 XR')">F 900 XR</button>
+        <button class="chip" onclick="selectChip('modelo',this,'S 1000 RR')">S 1000 RR</button>
+        <button class="chip" onclick="selectChip('modelo',this,'S 1000 XR')">S 1000 XR</button>
+        <button class="chip" onclick="selectChip('modelo',this,'R 18')">R 18</button>
+        <button class="chip" onclick="selectChip('modelo',this,'M 1000 RR')">M 1000 RR</button>
+        <button class="chip" onclick="selectChip('modelo',this,'CE 04')">CE 04</button>
+      </div>
+      <input class="outro-input" id="outro-modelo" placeholder="Outro modelo..." oninput="setOutroModelo(this.value)" />
+      <div class="field-row" style="margin-top:8px">
+        <div class="field-display empty" id="disp-modelo" style="font-size:13px">Nenhum modelo selecionado</div>
+        <button class="mic-btn" id="mic-modelo" onclick="startListen('modelo')" aria-label="Gravar modelo">
+          <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+        </button>
+      </div>
+      <div class="transcript-box" id="trans-modelo"><div class="transcript-label">Transcrição bruta</div><span id="trans-modelo-text"></span></div>
+    </div>
+  </div>
+
+  <!-- CONCESSIONÁRIA -->
+  <p class="section-title">Concessionária de interesse</p>
+  <div class="card">
+    <div class="field">
+      <div class="concession-list">
+        <button class="concession-item" onclick="selectConcession(this,'Euroville BH','Av. Raja Gabaglia, 3003','Belo Horizonte','MG')">
+          <div class="concession-name">Euroville — Belo Horizonte</div>
+          <div class="concession-addr">Av. Raja Gabaglia, 3003 — BH / MG</div>
+        </button>
+        <button class="concession-item" onclick="selectConcession(this,'Euroville JF','Av. Deusdeth Salgado, 4900','Juiz de Fora','MG')">
+          <div class="concession-name">Euroville — Juiz de Fora</div>
+          <div class="concession-addr">Av. Deusdeth Salgado, 4900 — JF / MG</div>
+        </button>
+        <button class="concession-item" onclick="selectConcession(this,'Euroville Uberaba','Av. Fernando Costa, 200','Uberaba','MG')">
+          <div class="concession-name">Euroville — Uberaba</div>
+          <div class="concession-addr">Av. Fernando Costa, 200 — Uberaba / MG</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitLead()" disabled>Salvar lead</button>
+  <div style="height:32px"></div>
+
+</div>
+</div>
+
+<!-- SUCCESS VIEW -->
+<div id="successView">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <div class="success-name" id="suc-nome"></div>
+  <div class="success-sub" id="suc-modelo"></div>
+  <div class="success-meta" id="suc-concession"></div>
+  <div class="btn-row" style="max-width:320px;margin:0 auto">
+    <button class="btn-ghost" onclick="showLeads()">Ver leads</button>
+    <button class="btn-primary" onclick="resetForm()">Novo lead</button>
+  </div>
+</div>
+
+<!-- LEADS VIEW -->
+<div id="leadsView">
+  <div class="leads-header">
+    <div>
+      <div class="leads-header-title">Leads coletados</div>
+      <div class="leads-header-count" id="leadsCount">0 registros</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="back-btn" onclick="showForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Voltar
+      </button>
+      <button class="export-btn" onclick="exportExcel()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar
+      </button>
+    </div>
+  </div>
+  <div id="leadsList"></div>
+</div>
+
+<script>
+// ── STATE ──
+const leads = JSON.parse(localStorage.getItem('bmw_leads') || '[]');
+const formData = { nome:'', email:'', celular:'', modelo:'', concessionaria:'', cidade:'', uf:'', endereco:'' };
+let recognition = null;
+let activeField = null;
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// ── STATUS ──
+function setStatus(msg, type) {
+  const bar = document.getElementById('statusBar');
+  const txt = document.getElementById('statusText');
+  bar.className = 'status-bar' + (type ? ' '+type : '');
+  txt.textContent = msg;
+}
+
+// ── COUNTER ──
+function updateCounter() {
+  document.getElementById('counterBtn').textContent = leads.length + (leads.length === 1 ? ' lead' : ' leads');
+}
+updateCounter();
+
+// ── MIC LISTEN ──
+function startListen(field) {
+  if (!SpeechRec) {
+    setStatus('Reconhecimento de voz não disponível neste navegador. Use Chrome.', 'error');
+    return;
+  }
+  // stop existing
+  if (recognition) { try { recognition.abort(); } catch(e){} }
+  // reset previous button
+  if (activeField) resetMicBtn(activeField);
+
+  activeField = field;
+  const btn = document.getElementById('mic-'+field);
+  btn.className = 'mic-btn listening';
+
+  const hints = {
+    nome: 'Diga o nome completo do cliente',
+    email: 'Diga o e-mail — fale "arroba" e "ponto"',
+    celular: 'Diga o celular com DDD',
+    modelo: 'Diga o modelo da moto'
+  };
+  setStatus('🎙 Ouvindo... ' + (hints[field]||''), 'listening');
+
+  recognition = new SpeechRec();
+  recognition.lang = 'pt-BR';
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 3;
+  recognition.continuous = false;
+
+  let finalResult = '';
+
+  recognition.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        finalResult += e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+    // show interim in status
+    if (interim) setStatus('🎙 ' + interim + '...', 'listening');
+  };
+
+  recognition.onend = () => {
+    if (!finalResult) {
+      resetMicBtn(field);
+      setStatus('Nenhum áudio detectado. Tente novamente.', 'error');
+      return;
+    }
+    const raw = finalResult.trim();
+    showTranscript(field, raw);
+    const clean = processVoice(field, raw);
+    setFieldValue(field, clean);
+    btn.className = 'mic-btn done';
+    setStatus('Campo preenchido: ' + clean, 'ok');
+    setTimeout(() => resetMicBtn(field), 3000);
+    activeField = null;
+  };
+
+  recognition.onerror = (e) => {
+    resetMicBtn(field);
+    const msgs = {
+      'not-allowed': 'Permissão de microfone negada. Toque em Permitir quando solicitado.',
+      'no-speech': 'Nenhum áudio detectado. Tente novamente.',
+      'aborted': 'Gravação cancelada.',
+      'network': 'Erro de rede. Verifique a conexão.'
+    };
+    setStatus(msgs[e.error] || 'Erro: ' + e.error, 'error');
+    activeField = null;
+  };
+
+  recognition.start();
+}
+
+function resetMicBtn(field) {
+  const btn = document.getElementById('mic-'+field);
+  if (btn) {
+    btn.className = 'mic-btn';
+  }
+}
+
+// ── SHOW TRANSCRIPT ──
+function showTranscript(field, raw) {
+  const box = document.getElementById('trans-'+field);
+  const txt = document.getElementById('trans-'+field+'-text');
+  if (box && txt) {
+    txt.textContent = raw;
+    box.classList.add('show');
+  }
+}
+
+// ── PROCESS VOICE ──
+function processVoice(field, raw) {
+  let t = raw.trim();
+  if (field === 'email') {
+    t = t.toLowerCase()
+      .replace(/\s+arroba\s+/gi, '@')
+      .replace(/\s*arroba\s*/gi, '@')
+      .replace(/\s+ponto\s+/gi, '.')
+      .replace(/\s*ponto\s*/gi, '.')
+      .replace(/\s+traço\s+/gi, '-')
+      .replace(/\s+underline\s+/gi, '_')
+      .replace(/\s+underscore\s+/gi, '_')
+      .replace(/\s/g, '');
+  }
+  if (field === 'celular') {
+    // keep only digits, spaces, parens, dash
+    t = t.replace(/[^\d\s\(\)\-\+]/g, '').trim();
+    // normalize: extract digits
+    const digits = t.replace(/\D/g,'');
+    if (digits.length >= 10) {
+      const ddd = digits.slice(0,2);
+      const num = digits.slice(2);
+      if (num.length === 9) t = '(' + ddd + ') ' + num.slice(0,5) + '-' + num.slice(5);
+      else if (num.length === 8) t = '(' + ddd + ') ' + num.slice(0,4) + '-' + num.slice(4);
+      else t = digits;
+    }
+  }
+  if (field === 'nome') {
+    t = t.replace(/\b\w/g, c => c.toUpperCase());
+  }
+  if (field === 'modelo') {
+    // try to match known models
+    const known = ['R 1300 GS Adventure','R 1300 GS','F 900 XR','F 900 R','S 1000 XR','S 1000 RR','M 1000 RR','R 18','CE 04'];
+    const up = t.toUpperCase();
+    for (const m of known) {
+      if (up.includes(m.replace(/ /g,'').toUpperCase()) || up.includes(m.toUpperCase())) {
+        // highlight chip
+        document.querySelectorAll('#chips-modelo .chip').forEach(c => {
+          if (c.textContent === m) { c.click(); }
+        });
+        return m;
+      }
+    }
+  }
+  return t;
+}
+
+// ── SET FIELD VALUE ──
+function setFieldValue(field, val) {
+  formData[field] = val;
+  const disp = document.getElementById('disp-'+field);
+  if (disp) {
+    disp.textContent = val || '';
+    disp.className = val ? 'field-display filled' : 'field-display empty';
+    if (!val) disp.textContent = { nome:'Nome completo', email:'E-mail', celular:'Celular com DDD', modelo:'Nenhum modelo selecionado' }[field] || '';
+  }
+  checkSubmit();
+}
+
+// ── EDIT FIELD (tap to edit) ──
+function editField(field) {
+  const disp = document.getElementById('disp-'+field);
+  if (!disp) return;
+  const current = formData[field] || '';
+  disp.contentEditable = 'true';
+  disp.textContent = current;
+  disp.focus();
+  // place cursor at end
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(disp);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  disp.addEventListener('blur', function handler() {
+    disp.contentEditable = 'false';
+    const newVal = disp.textContent.trim();
+    formData[field] = newVal;
+    disp.className = newVal ? 'field-display filled' : 'field-display empty';
+    if (!newVal) disp.textContent = { nome:'Nome completo', email:'E-mail', celular:'Celular com DDD' }[field] || '';
+    checkSubmit();
+    disp.removeEventListener('blur', handler);
+  }, { once: true });
+}
+
+// ── CHIPS ──
+function selectChip(field, el, val) {
+  document.querySelectorAll('#chips-'+field+' .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData[field] = val;
+  document.getElementById('outro-modelo').value = '';
+  const disp = document.getElementById('disp-'+field);
+  if (disp) { disp.textContent = val; disp.className = 'field-display filled'; }
+  checkSubmit();
+}
+
+function setOutroModelo(val) {
+  document.querySelectorAll('#chips-modelo .chip').forEach(c => c.classList.remove('selected'));
+  formData.modelo = val;
+  const disp = document.getElementById('disp-modelo');
+  if (disp) {
+    disp.textContent = val || 'Nenhum modelo selecionado';
+    disp.className = val ? 'field-display filled' : 'field-display empty';
+  }
+  checkSubmit();
+}
+
+// ── CONCESSION ──
+function selectConcession(el, name, addr, cidade, uf) {
+  document.querySelectorAll('.concession-item').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  formData.concessionaria = name;
+  formData.endereco = addr;
+  formData.cidade = cidade;
+  formData.uf = uf;
+  checkSubmit();
+}
+
+// ── CHECK SUBMIT ──
+function checkSubmit() {
+  const ok = formData.nome && formData.email && formData.celular && formData.modelo && formData.concessionaria;
+  document.getElementById('submitBtn').disabled = !ok;
+}
+
+// ── SUBMIT ──
+function submitLead() {
+  const lead = {
+    ...formData,
+    id: Date.now(),
+    timestamp: new Date().toLocaleString('pt-BR')
+  };
+  leads.push(lead);
+  localStorage.setItem('bmw_leads', JSON.stringify(leads));
+  updateCounter();
+
+  document.getElementById('formView').style.display = 'none';
+  document.getElementById('successView').style.display = 'block';
+  document.getElementById('suc-nome').textContent = lead.nome;
+  document.getElementById('suc-modelo').textContent = lead.modelo;
+  document.getElementById('suc-concession').textContent = lead.concessionaria + ' · ' + lead.cidade;
+}
+
+// ── RESET ──
+function resetForm() {
+  Object.keys(formData).forEach(k => formData[k]='');
+  ['nome','email','celular','modelo'].forEach(f => {
+    const disp = document.getElementById('disp-'+f);
+    const placeholders = { nome:'Nome completo', email:'E-mail', celular:'Celular com DDD', modelo:'Nenhum modelo selecionado' };
+    if (disp) { disp.textContent = placeholders[f]; disp.className = 'field-display empty'; }
+    resetMicBtn(f);
+    const tb = document.getElementById('trans-'+f);
+    if (tb) tb.classList.remove('show');
+  });
+  document.querySelectorAll('.chip, .concession-item').forEach(c => c.classList.remove('selected'));
+  document.getElementById('outro-modelo').value = '';
+  document.getElementById('submitBtn').disabled = true;
+  setStatus('Toque no microfone ao lado de cada campo para preencher por voz');
+  document.getElementById('successView').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+// ── LEADS VIEW ──
+function showLeads() {
+  document.getElementById('formView').style.display = 'none';
+  document.getElementById('successView').style.display = 'none';
+  document.getElementById('leadsView').style.display = 'block';
+  renderLeads();
+}
+
+function showForm() {
+  document.getElementById('leadsView').style.display = 'none';
+  document.getElementById('formView').style.display = 'block';
+}
+
+function renderLeads() {
+  const list = document.getElementById('leadsList');
+  document.getElementById('leadsCount').textContent = leads.length + (leads.length === 1 ? ' registro' : ' registros');
+  if (!leads.length) {
+    list.innerHTML = '<div class="empty-leads">Nenhum lead coletado ainda.<br>Preencha o formulário para começar.</div>';
+    return;
+  }
+  list.innerHTML = leads.slice().reverse().map((l,i) => `
+    <div class="lead-card">
+      <div class="lead-card-top">
+        <div class="lead-card-name">${l.nome}</div>
+        <div class="lead-card-time">${l.timestamp}</div>
+      </div>
+      <div class="lead-card-row"><span>Email</span>${l.email}</div>
+      <div class="lead-card-row"><span>Cel.</span>${l.celular}</div>
+      <div class="lead-card-row"><span>Local</span>${l.concessionaria}</div>
+      <span class="lead-tag">${l.modelo}</span>
+    </div>
+  `).join('');
+}
+
+// ── EXPORT EXCEL (CSV UTF-8 BOM → abre no Excel) ──
+function exportExcel() {
+  if (!leads.length) { alert('Nenhum lead para exportar.'); return; }
+
+  const headers = ['Nome Completo','E-mail','Celular','Moto de Interesse','Concessionária','Cidade','UF','Endereço','Data/Hora','ID'];
+  const rows = leads.map(l => [
+    l.nome, l.email, l.celular, l.modelo,
+    l.concessionaria, l.cidade, l.uf, l.endereco,
+    l.timestamp, l.id
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(cell => {
+      const s = String(cell || '').replace(/"/g, '""');
+      return '"' + s + '"';
+    }).join(';'))
+    .join('\r\n');
+
+  const BOM = '\uFEFF';
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const now = new Date();
+  const stamp = now.getFullYear() + '' +
+    String(now.getMonth()+1).padStart(2,'0') +
+    String(now.getDate()).padStart(2,'0') + '_' +
+    String(now.getHours()).padStart(2,'0') +
+    String(now.getMinutes()).padStart(2,'0');
+  a.href = url;
+  a.download = 'BMW_Leads_' + stamp + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
