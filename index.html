@@ -33,7 +33,12 @@
   .bmw-logo { width: 34px; height: 34px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .header-title { color: white; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.2; }
   .header-sub { color: rgba(255,255,255,0.45); font-size: 11px; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
   .counter-btn { background: var(--bmw-blue); color: white; font-size: 12px; font-weight: 600; padding: 5px 13px; border-radius: 20px; cursor: pointer; border: none; -webkit-appearance: none; }
+  .sync-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; transition: background 0.3s; }
+  .sync-indicator.synced { background: var(--green); }
+  .sync-indicator.syncing { background: var(--amber); animation: blink 0.6s infinite; }
+  .sync-indicator.error { background: var(--red); }
 
   .main { padding: 16px; max-width: 480px; margin: 0 auto; }
 
@@ -66,26 +71,37 @@
   .field-display.filled { background: white; border-color: var(--border-strong); color: var(--text); font-style: normal; }
   .field-display[contenteditable="true"] { outline: none; border-color: var(--bmw-blue); background: white; }
 
-  .mic-btn { width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; -webkit-appearance: none; }
+  .mic-btn { width: 44px; height: 44px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; -webkit-appearance: none; position: relative; }
   .mic-btn:active { transform: scale(0.92); }
   .mic-btn svg { width: 21px; height: 21px; stroke: var(--text-2); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-  .mic-btn.listening { background: var(--red-bg); border-color: var(--red); animation: pulse 0.9s infinite; }
+  .mic-btn.listening { background: var(--red-bg); border-color: var(--red); }
   .mic-btn.listening svg { stroke: var(--red); }
+  .mic-btn.listening::after { content:''; position:absolute; inset:-4px; border-radius:10px; border:2px solid var(--red); animation: ripple 1s infinite; }
   .mic-btn.done { background: var(--green-bg); border-color: var(--green); }
   .mic-btn.done svg { stroke: var(--green); }
-  @keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.07)} }
-
-  /* TIMER DE ESCUTA */
-  .listen-timer { font-size: 11px; font-weight: 700; color: var(--bmw-blue); min-width: 20px; text-align: right; }
+  .mic-btn.retry { background: var(--amber-bg); border-color: var(--amber); }
+  .mic-btn.retry svg { stroke: var(--amber); }
+  @keyframes ripple { 0%{transform:scale(1);opacity:1}100%{transform:scale(1.4);opacity:0} }
 
   .transcript-box { margin-top: 6px; padding: 8px 11px; border-radius: var(--radius-sm); background: var(--amber-bg); border: 1px solid #fcd34d; font-size: 12px; color: var(--amber); display: none; line-height: 1.5; }
   .transcript-box.show { display: block; }
   .trans-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 3px; opacity: 0.7; }
-  .trans-raw { margin-bottom: 2px; }
-  .trans-clean { color: #065f46; font-weight: 600; }
+
+  .confirm-box { margin-top: 8px; display: none; }
+  .confirm-box.show { display: block; }
+  .confirm-result { font-size: 16px; font-weight: 700; color: var(--text); padding: 10px 13px; background: white; border: 2px solid var(--bmw-blue); border-radius: var(--radius-sm); margin-bottom: 8px; text-align: center; word-break: break-all; }
+  .confirm-result.suspect { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .confirm-btns { display: flex; gap: 8px; }
+  .btn-confirm { flex: 1; padding: 11px; border: none; border-radius: var(--radius-sm); background: var(--green); color: white; font-size: 14px; font-weight: 600; cursor: pointer; -webkit-appearance: none; }
+  .btn-rerecord { flex: 1; padding: 11px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: white; color: var(--text-2); font-size: 14px; font-weight: 500; cursor: pointer; -webkit-appearance: none; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn-type { width: 100%; margin-top: 6px; padding: 9px; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: transparent; color: var(--text-3); font-size: 13px; cursor: pointer; -webkit-appearance: none; }
+
+  .mic-proximity { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bmw-dark); border-radius: var(--radius-sm); margin-bottom: 10px; font-size: 12px; color: white; }
+  .mic-proximity.show { display: flex; }
+  .proximity-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--red); flex-shrink: 0; animation: proxpulse 0.6s infinite; }
+  @keyframes proxpulse { 0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:0.5} }
 
   .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-3); margin-bottom: 8px; padding-left: 2px; }
-
   .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
   .chip { padding: 7px 13px; border: 1px solid var(--border); border-radius: 20px; font-size: 13px; cursor: pointer; color: var(--text-2); background: white; transition: all 0.15s; -webkit-appearance: none; white-space: nowrap; }
   .chip:active { transform: scale(0.95); }
@@ -103,16 +119,30 @@
   .outro-input { width: 100%; margin-top: 8px; padding: 10px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; color: var(--text); background: var(--surface-2); outline: none; -webkit-appearance: none; }
   .outro-input:focus { border-color: var(--bmw-blue); background: white; }
 
+  .inline-input { width: 100%; padding: 10px 13px; border: 2px solid var(--bmw-blue); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); background: white; outline: none; -webkit-appearance: none; display: none; margin-top: 6px; }
+  .inline-input.show { display: block; }
+
+  .val-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; display: none; margin-top: 5px; }
+  .val-badge.ok { background: var(--green-bg); color: var(--green); display: inline-block; }
+  .val-badge.bad { background: var(--red-bg); color: var(--red); display: inline-block; }
+
   .submit-btn { width: 100%; padding: 15px; border: none; border-radius: var(--radius); background: var(--bmw-blue); color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-appearance: none; letter-spacing: 0.3px; }
   .submit-btn:disabled { background: #c0cfe8; cursor: not-allowed; }
   .submit-btn:not(:disabled):active { transform: scale(0.98); background: #1558b0; }
+
+  /* FILA DE SYNC */
+  .queue-bar { display: none; padding: 8px 14px; background: var(--amber-bg); border-top: 1px solid #fcd34d; font-size: 12px; color: var(--amber); text-align: center; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; }
+  .queue-bar.show { display: block; }
 
   #successView { display: none; padding: 48px 24px; text-align: center; max-width: 480px; margin: 0 auto; }
   .success-icon { width: 72px; height: 72px; background: var(--green-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
   .success-icon svg { width: 36px; height: 36px; stroke: var(--green); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .success-name { font-size: 21px; font-weight: 700; margin-bottom: 4px; }
   .success-sub { font-size: 14px; color: var(--text-2); margin-bottom: 4px; }
-  .success-meta { font-size: 12px; color: var(--text-3); margin-bottom: 28px; }
+  .success-meta { font-size: 12px; color: var(--text-3); margin-bottom: 8px; }
+  .success-sync { font-size: 12px; margin-bottom: 24px; font-weight: 600; }
+  .success-sync.ok { color: var(--green); }
+  .success-sync.warn { color: var(--amber); }
   .btn-row { display: flex; gap: 10px; max-width: 320px; margin: 0 auto; }
   .btn-ghost { flex: 1; padding: 13px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: white; font-size: 14px; font-weight: 500; cursor: pointer; color: var(--text-2); -webkit-appearance: none; }
   .btn-primary { flex: 1; padding: 13px; border: none; border-radius: var(--radius); background: var(--bmw-blue); color: white; font-size: 14px; font-weight: 600; cursor: pointer; -webkit-appearance: none; }
@@ -124,15 +154,18 @@
   .btn-export { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid var(--bmw-blue); border-radius: var(--radius-sm); background: white; color: var(--bmw-blue); font-size: 13px; font-weight: 600; cursor: pointer; -webkit-appearance: none; }
   .btn-back { display: flex; align-items: center; gap: 5px; padding: 8px 13px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: white; color: var(--text-2); font-size: 13px; font-weight: 500; cursor: pointer; -webkit-appearance: none; }
   .lead-card { margin: 10px 16px 0; background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 15px; }
+  .lead-card.unsynced { border-left: 3px solid var(--amber); }
+  .lead-card.synced { border-left: 3px solid var(--green); }
   .lead-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 9px; }
   .lead-name { font-size: 15px; font-weight: 600; }
   .lead-time { font-size: 11px; color: var(--text-3); }
   .lead-row { font-size: 13px; color: var(--text-2); margin-bottom: 3px; display: flex; gap: 6px; }
   .lead-row-label { color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; width: 52px; flex-shrink: 0; padding-top: 1px; }
   .lead-tag { display: inline-block; margin-top: 8px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #e8f0fd; color: var(--bmw-blue); }
+  .lead-sync-tag { display: inline-block; margin-top: 8px; margin-left: 6px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .lead-sync-tag.ok { background: var(--green-bg); color: var(--green); }
+  .lead-sync-tag.pending { background: var(--amber-bg); color: var(--amber); }
   .empty-leads { text-align: center; padding: 60px 20px; color: var(--text-3); font-size: 14px; }
-
-  /* DICA DE USO */
   .tip-box { background: #e8f0fd; border: 1px solid #93b4f0; border-radius: var(--radius-sm); padding: 10px 13px; font-size: 12px; color: #1a3a6b; margin-bottom: 14px; line-height: 1.6; }
   .tip-box strong { font-weight: 700; }
 </style>
@@ -155,15 +188,30 @@
       <div class="header-sub">Captura de lead · evento</div>
     </div>
   </div>
-  <button class="counter-btn" onclick="showLeads()" id="counterBtn">0 leads</button>
+  <div class="header-right">
+    <div class="sync-indicator" id="syncDot" title="Status de sincronização"></div>
+    <button class="counter-btn" onclick="showLeads()" id="counterBtn">0 leads</button>
+  </div>
 </header>
+
+<!-- Fila offline -->
+<div class="queue-bar" id="queueBar"></div>
 
 <div id="formView">
 <div class="main">
 
-  <!-- DICA DE USO -->
   <div class="tip-box">
-    <strong>Como usar o microfone:</strong> toque no botão 🎤, aguarde ficar vermelho, fale próximo ao celular em voz normal. Aguarde parar de piscar antes de falar. Se não preencher, toque novamente para tentar outra vez.
+    <strong>Ambiente com ruído:</strong> aproxime o celular da boca do cliente ao gravar. Confirme cada campo antes de avançar. Leads salvos na nuvem em tempo real.
+  </div>
+
+  <div class="mic-proximity" id="proximityBanner">
+    <div class="proximity-pulse"></div>
+    <span>📱 Aproxime o celular da boca do cliente agora</span>
+  </div>
+
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot"></div>
+    <span id="statusText">Siga os scripts e toque no microfone após cada resposta</span>
   </div>
 
   <p class="section-title">Dados do cliente</p>
@@ -174,7 +222,7 @@
     <div>
       <div class="script-label">Pergunte ao cliente</div>
       <div class="script-text">"Qual é o seu nome completo?"</div>
-      <div class="script-tip">Toque no microfone após o cliente responder</div>
+      <div class="script-tip">Aproxime o celular antes de tocar no microfone</div>
     </div>
   </div>
   <div class="card">
@@ -186,11 +234,19 @@
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
         </button>
       </div>
+      <div class="confirm-box" id="confirm-nome">
+        <div class="confirm-result" id="confirm-nome-result"></div>
+        <div class="confirm-btns">
+          <button class="btn-confirm" onclick="confirmField('nome')">✓ Confirmar</button>
+          <button class="btn-rerecord" onclick="rerecord('nome')">↩ Regravar</button>
+        </div>
+        <button class="btn-type" id="type-btn-nome" style="display:none" onclick="showTypeMode('nome')">⌨️ Digitar manualmente</button>
+      </div>
+      <input class="inline-input" id="inline-nome" placeholder="Digite o nome completo..." oninput="inlineInput('nome', this.value)" />
+      <span class="val-badge" id="badge-nome"></span>
       <div class="transcript-box" id="trans-nome">
         <div class="trans-label">Transcrição bruta</div>
         <div class="trans-raw" id="trans-nome-raw"></div>
-        <div class="trans-label" style="margin-top:4px">Salvo como</div>
-        <div class="trans-clean" id="trans-nome-clean"></div>
       </div>
     </div>
   </div>
@@ -213,11 +269,19 @@
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
         </button>
       </div>
+      <div class="confirm-box" id="confirm-email">
+        <div class="confirm-result" id="confirm-email-result"></div>
+        <div class="confirm-btns">
+          <button class="btn-confirm" onclick="confirmField('email')">✓ Confirmar</button>
+          <button class="btn-rerecord" onclick="rerecord('email')">↩ Regravar</button>
+        </div>
+        <button class="btn-type" id="type-btn-email" style="display:none" onclick="showTypeMode('email')">⌨️ Digitar manualmente</button>
+      </div>
+      <input class="inline-input" id="inline-email" placeholder="Digite o e-mail..." oninput="inlineInput('email', this.value)" />
+      <span class="val-badge" id="badge-email"></span>
       <div class="transcript-box" id="trans-email">
         <div class="trans-label">Transcrição bruta</div>
         <div class="trans-raw" id="trans-email-raw"></div>
-        <div class="trans-label" style="margin-top:4px">Salvo como</div>
-        <div class="trans-clean" id="trans-email-clean"></div>
       </div>
     </div>
   </div>
@@ -228,7 +292,7 @@
     <div>
       <div class="script-label">Pergunte ao cliente</div>
       <div class="script-text">"Qual é o seu celular com DDD?"</div>
-      <div class="script-tip">Cliente fala os números em voz alta, dígito por dígito</div>
+      <div class="script-tip">Cliente fala dígito por dígito próximo ao celular</div>
     </div>
   </div>
   <div class="card">
@@ -240,11 +304,19 @@
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
         </button>
       </div>
+      <div class="confirm-box" id="confirm-celular">
+        <div class="confirm-result" id="confirm-celular-result"></div>
+        <div class="confirm-btns">
+          <button class="btn-confirm" onclick="confirmField('celular')">✓ Confirmar</button>
+          <button class="btn-rerecord" onclick="rerecord('celular')">↩ Regravar</button>
+        </div>
+        <button class="btn-type" id="type-btn-celular" style="display:none" onclick="showTypeMode('celular')">⌨️ Digitar manualmente</button>
+      </div>
+      <input class="inline-input" id="inline-celular" placeholder="Digite o celular com DDD..." oninput="inlineInput('celular', this.value)" inputmode="numeric" />
+      <span class="val-badge" id="badge-celular"></span>
       <div class="transcript-box" id="trans-celular">
         <div class="trans-label">Transcrição bruta</div>
         <div class="trans-raw" id="trans-celular-raw"></div>
-        <div class="trans-label" style="margin-top:4px">Salvo como</div>
-        <div class="trans-clean" id="trans-celular-clean"></div>
       </div>
     </div>
   </div>
@@ -256,7 +328,7 @@
     <div>
       <div class="script-label">Pergunte ao cliente</div>
       <div class="script-text">"Qual modelo te chamou mais atenção?"</div>
-      <div class="script-tip">Ou toque direto no modelo abaixo — mais rápido</div>
+      <div class="script-tip">Ou toque direto no modelo abaixo — mais rápido no evento</div>
     </div>
   </div>
   <div class="card">
@@ -279,11 +351,16 @@
           <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
         </button>
       </div>
+      <div class="confirm-box" id="confirm-modelo">
+        <div class="confirm-result" id="confirm-modelo-result"></div>
+        <div class="confirm-btns">
+          <button class="btn-confirm" onclick="confirmField('modelo')">✓ Confirmar</button>
+          <button class="btn-rerecord" onclick="rerecord('modelo')">↩ Regravar</button>
+        </div>
+      </div>
       <div class="transcript-box" id="trans-modelo">
         <div class="trans-label">Transcrição bruta</div>
         <div class="trans-raw" id="trans-modelo-raw"></div>
-        <div class="trans-label" style="margin-top:4px">Interpretado como</div>
-        <div class="trans-clean" id="trans-modelo-clean"></div>
       </div>
     </div>
   </div>
@@ -307,29 +384,25 @@
     </div>
   </div>
 
-  <div class="status-bar" id="statusBar">
-    <div class="status-dot"></div>
-    <span id="statusText">Siga os scripts e toque no microfone após cada resposta</span>
-  </div>
-
   <button class="submit-btn" id="submitBtn" onclick="submitLead()" disabled>Salvar lead</button>
-  <div style="height:32px"></div>
+  <div style="height:48px"></div>
 </div>
 </div>
 
-<!-- SUCCESS VIEW -->
+<!-- SUCCESS -->
 <div id="successView">
   <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
   <div class="success-name" id="suc-nome"></div>
   <div class="success-sub" id="suc-modelo"></div>
   <div class="success-meta" id="suc-concession"></div>
+  <div class="success-sync" id="suc-sync"></div>
   <div class="btn-row">
     <button class="btn-ghost" onclick="showLeads()">Ver leads</button>
     <button class="btn-primary" onclick="resetForm()">Novo lead</button>
   </div>
 </div>
 
-<!-- LEADS VIEW -->
+<!-- LEADS -->
 <div id="leadsView">
   <div class="leads-header">
     <div>
@@ -343,7 +416,7 @@
       </button>
       <button class="btn-export" onclick="exportCSV()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Exportar
+        Exportar CSV
       </button>
     </div>
   </div>
@@ -351,14 +424,128 @@
 </div>
 
 <script>
-const leads = JSON.parse(localStorage.getItem('bmw_leads_v2') || '[]');
+// ════════════════════════════════════════════════
+// ⚠️  CONFIGURAÇÃO — COLE SUA URL AQUI APÓS
+//     PUBLICAR O APPS SCRIPT COMO WEB APP
+// ════════════════════════════════════════════════
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxXul1e07hsglusZfdXzX1oR0hs-j6pCEPuTtxuPmBH7woFKRVMghdIfUsoxocpAyflJA/exec';
+// ════════════════════════════════════════════════
+
+// ── STORAGE SEGURO ──
+function storageGet(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch(e) { return null; }
+}
+function storageSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+  catch(e) { setStatus('⚠️ Armazenamento cheio! Exporte os leads agora.', 'error'); return false; }
+}
+
+// ── STATE ──
+const leads = storageGet('bmw_leads_v4') || [];
+const syncQueue = storageGet('bmw_sync_queue') || []; // fila offline
 const fd = { nome:'', email:'', celular:'', modelo:'', concessionaria:'', cidade:'', uf:'', endereco:'' };
+const pending = { nome:null, email:null, celular:null, modelo:null };
+const failCount = { nome:0, email:0, celular:0, modelo:0 };
 let activeField = null;
 let listenTimeout = null;
 let interimBuffer = '';
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-// ── PREFIXOS A FILTRAR ──
+// ── SYNC STATUS ──
+function setSyncDot(state) {
+  const d = document.getElementById('syncDot');
+  if (d) d.className = 'sync-indicator' + (state ? ' '+state : '');
+}
+
+function updateQueueBar() {
+  const bar = document.getElementById('queueBar');
+  if (!bar) return;
+  if (syncQueue.length > 0) {
+    bar.className = 'queue-bar show';
+    bar.textContent = `⚠️ ${syncQueue.length} lead(s) aguardando sincronização com o Sheets — verifique a internet`;
+  } else {
+    bar.className = 'queue-bar';
+  }
+}
+
+// ── ENVIO PARA GOOGLE SHEETS ──
+async function sendToSheets(lead) {
+  if (!SHEETS_URL || SHEETS_URL === 'COLE_AQUI_A_URL_DO_APPS_SCRIPT') return { ok: false, offline: true };
+  try {
+    setSyncDot('syncing');
+    const res = await fetch(SHEETS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // Apps Script requer text/plain para CORS
+      body: JSON.stringify(lead)
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      setSyncDot('synced');
+      return { ok: true };
+    }
+    setSyncDot('error');
+    return { ok: false };
+  } catch(e) {
+    setSyncDot('error');
+    return { ok: false, offline: true };
+  }
+}
+
+// ── REENVIO DA FILA OFFLINE ──
+async function flushQueue() {
+  if (syncQueue.length === 0) return;
+  if (!navigator.onLine) return;
+  const toRetry = [...syncQueue];
+  syncQueue.length = 0;
+  for (const lead of toRetry) {
+    const result = await sendToSheets(lead);
+    if (!result.ok) syncQueue.push(lead); // volta para fila se falhar
+    else {
+      // marca como sincronizado no array principal
+      const l = leads.find(x => x.id === lead.id);
+      if (l) l.synced = true;
+    }
+  }
+  storageSet('bmw_sync_queue', syncQueue);
+  storageSet('bmw_leads_v4', leads);
+  updateQueueBar();
+}
+
+// Tenta reenviar quando voltar a conexão
+window.addEventListener('online', () => { setSyncDot('syncing'); flushQueue(); });
+window.addEventListener('offline', () => setSyncDot('error'));
+
+// ── VALIDAÇÃO ──
+function validate(field, val) {
+  if (!val) return { ok: false, msg: '' };
+  if (field === 'nome') {
+    if (val.length < 3) return { ok: false, msg: '⚠️ Nome muito curto — regravar?' };
+    if (val.trim().split(/\s+/).length < 2) return { ok: false, msg: '⚠️ Parece incompleto — nome e sobrenome?' };
+    return { ok: true, msg: '✓ Nome válido' };
+  }
+  if (field === 'email') {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) return { ok: false, msg: '⚠️ E-mail suspeito — sem @ ou ponto válido' };
+    return { ok: true, msg: '✓ E-mail válido' };
+  }
+  if (field === 'celular') {
+    const d = val.replace(/\D/g,'');
+    if (d.length < 10) return { ok: false, msg: '⚠️ Menos de 10 dígitos — regravar?' };
+    if (d.length > 11) return { ok: false, msg: '⚠️ Muitos dígitos — conferir' };
+    return { ok: true, msg: '✓ Celular válido' };
+  }
+  return { ok: true, msg: '' };
+}
+
+function showBadge(field, val) {
+  const badge = document.getElementById('badge-'+field);
+  if (!badge) return;
+  if (!val) { badge.className = 'val-badge'; badge.textContent = ''; return; }
+  const v = validate(field, val);
+  badge.className = 'val-badge ' + (v.ok ? 'ok' : 'bad');
+  badge.textContent = v.msg;
+}
+
+// ── PREFIXOS ──
 const PREFIXES = {
   nome: [/^(o\s+meu\s+nome\s+[eé]\s+)/i,/^(meu\s+nome\s+[eé]\s+)/i,/^(me\s+chamo\s+)/i,/^(pode\s+anotar\s+)/i,/^([eé]\s+o\s+)/i,/^([eé]\s+a\s+)/i,/^(sou\s+o\s+)/i,/^(sou\s+a\s+)/i,/^(aqui\s+[eé]\s+)/i,/^(seria\s+)/i,/^(chamo\s+)/i,/^(o\s+nome\s+[eé]\s+)/i,/^(meu\s+nome\s+)/i,/^(nome\s+[eé]\s+)/i,/^(nome\s+)/i,/^(oi\s+)/i],
   email: [/^(o\s+meu\s+e-?mail\s+[eé]\s+)/i,/^(meu\s+e-?mail\s+[eé]\s+)/i,/^(meu\s+e-?mail\s+)/i,/^(e-?mail\s+[eé]\s+)/i,/^(e-?mail\s+)/i,/^([eé]\s+o\s+)/i,/^(seria\s+)/i,/^(pode\s+anotar\s+)/i],
@@ -371,23 +558,15 @@ function stripPhrases(text, field) {
   let t = text.trim();
   const prefs = PREFIXES[field] || [];
   let changed = true;
-  while (changed) {
-    changed = false;
-    for (const rx of prefs) {
-      const n = t.replace(rx, '');
-      if (n !== t) { t = n.trim(); changed = true; }
-    }
-  }
-  for (const rx of SUFFIXES) t = t.replace(rx, '').trim();
+  while (changed) { changed = false; for (const rx of prefs) { const n = t.replace(rx,''); if (n!==t){t=n.trim();changed=true;} } }
+  for (const rx of SUFFIXES) t = t.replace(rx,'').trim();
   return t;
 }
 
 function processVoice(field, raw) {
   let t = stripPhrases(raw, field);
-  if (field === 'nome') {
-    t = t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  }
-  if (field === 'email') {
+  if (field==='nome') t = t.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+  if (field==='email') {
     t = t.toLowerCase()
       .replace(/\s+arroba\s+/gi,'@').replace(/\s*arroba\s*/gi,'@')
       .replace(/\s+ponto\s+com\s+b\s*r/gi,'.com.br')
@@ -396,317 +575,246 @@ function processVoice(field, raw) {
       .replace(/\s+underline\s+/gi,'_').replace(/\s+underscore\s+/gi,'_')
       .replace(/\s/g,'');
   }
-  if (field === 'celular') {
+  if (field==='celular') {
     const digits = t.replace(/\D/g,'');
-    if (digits.length >= 10) {
-      const ddd = digits.slice(0,2), num = digits.slice(2);
-      if (num.length === 9) t = '('+ddd+') '+num.slice(0,5)+'-'+num.slice(5);
-      else if (num.length === 8) t = '('+ddd+') '+num.slice(0,4)+'-'+num.slice(4);
-      else t = digits;
-    } else { t = digits || t; }
+    if (digits.length>=10) {
+      const ddd=digits.slice(0,2),num=digits.slice(2);
+      if (num.length===9) t='('+ddd+') '+num.slice(0,5)+'-'+num.slice(5);
+      else if (num.length===8) t='('+ddd+') '+num.slice(0,4)+'-'+num.slice(4);
+      else t=digits;
+    } else { t=digits||t; }
   }
-  if (field === 'modelo') {
-    const known = ['R 1300 GS Adventure','R 1300 GS','F 900 XR','F 900 R','S 1000 XR','S 1000 RR','M 1000 RR','R 18','CE 04'];
-    const norm = t.toUpperCase().replace(/\s+/g,'');
-    for (const m of known) {
-      if (norm.includes(m.replace(/\s+/g,'').toUpperCase())) {
-        document.querySelectorAll('#chips-modelo .chip').forEach(c => { if (c.textContent.trim()===m) selectChip(c,m); });
-        return m;
-      }
-    }
-    t = t.toUpperCase();
+  if (field==='modelo') {
+    const known=['R 1300 GS Adventure','R 1300 GS','F 900 XR','F 900 R','S 1000 XR','S 1000 RR','M 1000 RR','R 18','CE 04'];
+    const norm=t.toUpperCase().replace(/\s+/g,'');
+    for (const m of known) { if (norm.includes(m.replace(/\s+/g,'').toUpperCase())) return m; }
+    t=t.toUpperCase();
   }
   return t;
 }
 
 // ── STATUS ──
-function setStatus(msg, type) {
-  const bar = document.getElementById('statusBar');
-  bar.className = 'status-bar'+(type?' '+type:'');
-  document.getElementById('statusText').textContent = msg;
+function setStatus(msg,type) {
+  const bar=document.getElementById('statusBar');
+  if(!bar)return;
+  bar.className='status-bar'+(type?' '+type:'');
+  document.getElementById('statusText').textContent=msg;
 }
 
-// ── MICROFONE — versão robusta com timeout e retry ──
+function showProximity(show) {
+  const b=document.getElementById('proximityBanner');
+  if(b) b.className='mic-proximity'+(show?' show':'');
+}
+
+// ── MICROFONE ──
 function startListen(field) {
-  if (!SR) { setStatus('Reconhecimento de voz indisponível. Use o Chrome.', 'error'); return; }
-
-  // Se já está ouvindo este campo, cancela (toggle)
-  if (activeField === field) {
-    cancelListen();
-    setStatus('Gravação cancelada. Toque novamente para tentar.', 'warn');
-    return;
-  }
-
-  // Cancela qualquer escuta anterior
+  if(!SR){setStatus('Reconhecimento de voz indisponível. Use o Chrome.','error');return;}
+  if(activeField===field){cancelListen();setStatus('Gravação cancelada.','warn');return;}
   cancelListen();
-  activeField = field;
-
-  const btn = document.getElementById('mic-'+field);
-  btn.className = 'mic-btn listening';
-  setStatus('🎙 Ouvindo... fale agora em voz normal', 'listening');
-
-  // Cria NOVA instância sempre — evita travamento de estado
-  const rec = new SR();
-  rec.lang = 'pt-BR';
-  rec.interimResults = true;
-  rec.maxAlternatives = 1;
-  rec.continuous = false;
-
-  let finalResult = '';
-  let gotSomething = false;
-
-  // TIMEOUT: se em 10s não vier resultado final, encerra e avisa
-  listenTimeout = setTimeout(() => {
-    try { rec.stop(); } catch(e){}
-    if (!gotSomething) {
-      resetMicBtn(field);
-      activeField = null;
-      setStatus('Não captou áudio. Fale mais alto ou toque novamente.', 'warn');
-    }
-  }, 10000);
-
-  rec.onresult = (e) => {
-    // Reseta timeout a cada fala detectada
+  hideConfirm(field);
+  activeField=field;
+  const btn=document.getElementById('mic-'+field);
+  btn.className='mic-btn listening';
+  showProximity(true);
+  setStatus('🎙 Ouvindo... aproxime o celular da boca do cliente','listening');
+  const rec=new SR();
+  rec.lang='pt-BR';
+  rec.interimResults=true;
+  rec.maxAlternatives=1;
+  rec.continuous=false;
+  let finalResult='',gotSomething=false;
+  listenTimeout=setTimeout(()=>{
+    try{rec.stop();}catch(e){}
+    if(!gotSomething){resetMicBtn(field);activeField=null;showProximity(false);failCount[field]=(failCount[field]||0)+1;if(failCount[field]>=2)showTypeBtn(field);setStatus('Não captou áudio. Fale mais alto ou use digitação.','warn');}
+  },10000);
+  rec.onresult=(e)=>{
     clearTimeout(listenTimeout);
-    listenTimeout = setTimeout(() => { try { rec.stop(); } catch(e){} }, 4000);
-
-    let interim = '';
-    finalResult = '';
-    for (let i = 0; i < e.results.length; i++) {
-      if (e.results[i].isFinal) {
-        finalResult += e.results[i][0].transcript;
-        gotSomething = true;
-      } else {
-        interim += e.results[i][0].transcript;
-      }
+    listenTimeout=setTimeout(()=>{try{rec.stop();}catch(e){}},4000);
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal){finalResult+=e.results[i][0].transcript;gotSomething=true;}
+      else{interim+=e.results[i][0].transcript;interimBuffer=interim;}
     }
-    if (interim) setStatus('🎙 ' + interim, 'listening');
+    if(interim)setStatus('🎙 '+interim,'listening');
   };
-
-  rec.onend = () => {
-    clearTimeout(listenTimeout);
-    listenTimeout = null;
-
-    if (!finalResult.trim()) {
-      // Tinha algo interim mas não finalizou — usa o interim como fallback
-      if (interimBuffer.trim()) {
-        finalResult = interimBuffer;
-      } else {
-        resetMicBtn(field);
-        activeField = null;
-        if (gotSomething) {
-          setStatus('Não conseguiu processar. Toque no microfone e tente novamente.', 'warn');
-        } else {
-          setStatus('Nenhuma fala captada. Fale mais alto e tente novamente.', 'warn');
-        }
-        return;
-      }
+  rec.onend=()=>{
+    clearTimeout(listenTimeout);listenTimeout=null;showProximity(false);
+    if(!finalResult.trim()&&interimBuffer.trim())finalResult=interimBuffer;
+    if(!finalResult.trim()){
+      resetMicBtn(field);activeField=null;
+      failCount[field]=(failCount[field]||0)+1;if(failCount[field]>=2)showTypeBtn(field);
+      setStatus(gotSomething?'Não processou. Tente novamente.':'Nenhuma fala captada. Fale mais alto.','warn');return;
     }
-
-    const raw = finalResult.trim();
-    const clean = processVoice(field, raw);
-    showTranscript(field, raw, clean);
-    setFieldValue(field, clean);
-    btn.className = 'mic-btn done';
-    setStatus('✓ Preenchido — confira e corrija tocando no campo se necessário', 'ok');
-    setTimeout(() => resetMicBtn(field), 3500);
-    activeField = null;
-    interimBuffer = '';
+    const raw=finalResult.trim();
+    const clean=processVoice(field,raw);
+    const tr=document.getElementById('trans-'+field+'-raw');if(tr)tr.textContent=raw;
+    const tb=document.getElementById('trans-'+field);if(tb)tb.classList.add('show');
+    showConfirm(field,clean);
+    btn.className='mic-btn done';
+    setStatus('Confira o resultado e toque em Confirmar ou Regravar','warn');
+    activeField=null;interimBuffer='';failCount[field]=0;
   };
-
-  rec.onerror = (e) => {
-    clearTimeout(listenTimeout);
-    resetMicBtn(field);
-    activeField = null;
-    const msgs = {
-      'not-allowed': '🔒 Microfone bloqueado — vá em Config do Chrome > Microfone e permita github.io',
-      'no-speech': 'Nenhuma fala detectada. Tente novamente falando mais alto.',
-      'aborted': 'Gravação cancelada.',
-      'network': '⚠️ Sem internet — o reconhecimento de voz precisa de conexão.',
-      'audio-capture': 'Microfone não encontrado neste dispositivo.',
-      'service-not-allowed': '🔒 Permissão negada. Abra pelo link https:// no Chrome.'
-    };
-    setStatus(msgs[e.error] || 'Erro: '+e.error+'. Tente novamente.', 'error');
+  rec.onerror=(e)=>{
+    clearTimeout(listenTimeout);resetMicBtn(field);activeField=null;showProximity(false);
+    failCount[field]=(failCount[field]||0)+1;if(failCount[field]>=2)showTypeBtn(field);
+    const msgs={'not-allowed':'🔒 Microfone bloqueado — Config Chrome > permita github.io','no-speech':'Nenhuma fala. Tente novamente.','aborted':'Gravação cancelada.','network':'⚠️ Sem internet.','audio-capture':'Microfone não encontrado.','service-not-allowed':'🔒 Permissão negada.'};
+    setStatus(msgs[e.error]||'Erro: '+e.error,'error');
   };
-
-  // Captura interim para fallback
-  rec.addEventListener('result', (e) => {
-    for (let i = 0; i < e.results.length; i++) {
-      if (!e.results[i].isFinal) interimBuffer = e.results[i][0].transcript;
-    }
-  });
-
-  try {
-    rec.start();
-  } catch(e) {
-    resetMicBtn(field);
-    activeField = null;
-    setStatus('Erro ao iniciar microfone. Recarregue a página.', 'error');
-  }
+  try{rec.start();}catch(e){resetMicBtn(field);activeField=null;showProximity(false);setStatus('Erro ao iniciar. Recarregue a página.','error');}
 }
 
-function cancelListen() {
-  if (listenTimeout) { clearTimeout(listenTimeout); listenTimeout = null; }
-  if (activeField) { resetMicBtn(activeField); }
-  activeField = null;
-  interimBuffer = '';
-}
+function cancelListen(){if(listenTimeout){clearTimeout(listenTimeout);listenTimeout=null;}if(activeField)resetMicBtn(activeField);activeField=null;interimBuffer='';showProximity(false);}
+function resetMicBtn(field){const btn=document.getElementById('mic-'+field);if(btn)btn.className='mic-btn';}
 
-function resetMicBtn(field) {
-  const btn = document.getElementById('mic-'+field);
-  if (btn) btn.className = 'mic-btn';
-}
-
-function showTranscript(field, raw, clean) {
-  const box = document.getElementById('trans-'+field);
-  const r = document.getElementById('trans-'+field+'-raw');
-  const c = document.getElementById('trans-'+field+'-clean');
-  if (!box) return;
-  if (r) r.textContent = raw;
-  if (c) c.textContent = clean;
+// ── CONFIRMAÇÃO ──
+function showConfirm(field,val){
+  pending[field]=val;
+  const box=document.getElementById('confirm-'+field);
+  const res=document.getElementById('confirm-'+field+'-result');
+  if(!box||!res)return;
+  res.textContent=val;
+  const v=validate(field,val);
+  res.className='confirm-result'+(v.ok?'':' suspect');
   box.classList.add('show');
+  showBadge(field,val);
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function hideConfirm(field){const box=document.getElementById('confirm-'+field);if(box)box.classList.remove('show');pending[field]=null;}
+
+function confirmField(field){
+  const val=pending[field];if(!val)return;
+  if(field==='celular'&&val.replace(/\D/g,'').length<10){setStatus('⚠️ Celular com menos de 10 dígitos — toque em Regravar','error');return;}
+  if(field==='email'&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)){setStatus('⚠️ E-mail suspeito — confirme mesmo assim ou regravar','warn');}
+  setFieldValue(field,val);hideConfirm(field);
+  if(field==='modelo'){document.querySelectorAll('#chips-modelo .chip').forEach(c=>{if(c.textContent.trim()===val)c.classList.add('selected');});}
+  setStatus('✓ Campo salvo — próximo!','ok');resetMicBtn(field);
+}
+
+function rerecord(field){hideConfirm(field);pending[field]=null;const btn=document.getElementById('mic-'+field);if(btn)btn.className='mic-btn retry';showBadge(field,null);setStatus('Toque no microfone para tentar novamente','warn');setTimeout(()=>{if(btn)btn.className='mic-btn';},2000);}
+
+// ── MODO DIGITAÇÃO ──
+function showTypeBtn(field){const btn=document.getElementById('type-btn-'+field);if(btn)btn.style.display='block';}
+function showTypeMode(field){const inp=document.getElementById('inline-'+field);const box=document.getElementById('confirm-'+field);if(inp){inp.className='inline-input show';inp.focus();}if(box)box.classList.remove('show');resetMicBtn(field);setStatus('⌨️ Digite o dado e ele será salvo automaticamente','warn');}
+function inlineInput(field,val){
+  showBadge(field,val);
+  if(field==='celular'){const digits=val.replace(/\D/g,'');if(digits.length>=10){const ddd=digits.slice(0,2),num=digits.slice(2);let fmt='';if(num.length===9)fmt='('+ddd+') '+num.slice(0,5)+'-'+num.slice(5);else if(num.length===8)fmt='('+ddd+') '+num.slice(0,4)+'-'+num.slice(4);if(fmt){const inp=document.getElementById('inline-celular');if(inp&&inp.value!==fmt)inp.value=fmt;val=fmt;}}}
+  setFieldValue(field,val.trim());
 }
 
 // ── CAMPOS ──
-function setFieldValue(field, val) {
-  fd[field] = val;
-  const disp = document.getElementById('disp-'+field);
-  if (disp) {
-    disp.textContent = val || '';
-    disp.className = val ? 'field-display filled' : 'field-display empty';
-    if (!val) disp.textContent = {nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'}[field]||'';
-  }
-  checkSubmit();
-}
-
-function editField(field) {
-  const disp = document.getElementById('disp-'+field);
-  if (!disp) return;
-  disp.contentEditable = 'true';
-  disp.textContent = fd[field] || '';
-  disp.focus();
-  const range = document.createRange(), sel = window.getSelection();
-  range.selectNodeContents(disp); range.collapse(false);
-  sel.removeAllRanges(); sel.addRange(range);
-  disp.addEventListener('blur', function h() {
-    disp.contentEditable = 'false';
-    const v = disp.textContent.trim();
-    fd[field] = v;
-    disp.className = v ? 'field-display filled' : 'field-display empty';
-    if (!v) disp.textContent = {nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'}[field]||'';
-    checkSubmit();
-    disp.removeEventListener('blur', h);
-  }, {once:true});
-}
-
-function selectChip(el, val) {
-  document.querySelectorAll('#chips-modelo .chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  fd.modelo = val;
-  document.getElementById('outro-modelo').value = '';
-  checkSubmit();
-}
-
-function setOutroModelo(val) {
-  document.querySelectorAll('#chips-modelo .chip').forEach(c => c.classList.remove('selected'));
-  fd.modelo = val;
-  checkSubmit();
-}
-
-function selectConcession(el, name, addr, cidade, uf) {
-  document.querySelectorAll('.concession-item').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  fd.concessionaria = name; fd.endereco = addr; fd.cidade = cidade; fd.uf = uf;
-  checkSubmit();
-}
-
-function checkSubmit() {
-  document.getElementById('submitBtn').disabled = !(fd.nome && fd.email && fd.celular && fd.modelo && fd.concessionaria);
-}
+function sanitize(str){const d=document.createElement('div');d.textContent=String(str||'');return d.innerHTML;}
+function setFieldValue(field,val){fd[field]=val;const disp=document.getElementById('disp-'+field);if(disp){disp.textContent=val||'';disp.className=val?'field-display filled':'field-display empty';if(!val)disp.textContent={nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'}[field]||'';}checkSubmit();}
+function editField(field){const disp=document.getElementById('disp-'+field);if(!disp)return;disp.contentEditable='true';disp.textContent=fd[field]||'';disp.focus();const range=document.createRange(),sel=window.getSelection();range.selectNodeContents(disp);range.collapse(false);sel.removeAllRanges();sel.addRange(range);disp.addEventListener('blur',function h(){disp.contentEditable='false';const v=disp.textContent.trim();fd[field]=v;disp.className=v?'field-display filled':'field-display empty';if(!v)disp.textContent={nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'}[field]||'';showBadge(field,v);checkSubmit();disp.removeEventListener('blur',h);},{once:true});}
+function selectChip(el,val){document.querySelectorAll('#chips-modelo .chip').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');fd.modelo=val;document.getElementById('outro-modelo').value='';hideConfirm('modelo');checkSubmit();}
+function setOutroModelo(val){document.querySelectorAll('#chips-modelo .chip').forEach(c=>c.classList.remove('selected'));fd.modelo=val;checkSubmit();}
+function selectConcession(el,name,addr,cidade,uf){document.querySelectorAll('.concession-item').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');fd.concessionaria=name;fd.endereco=addr;fd.cidade=cidade;fd.uf=uf;checkSubmit();}
+function checkSubmit(){document.getElementById('submitBtn').disabled=!(fd.nome&&fd.email&&fd.celular&&fd.modelo&&fd.concessionaria);}
 
 // ── SUBMIT ──
-function submitLead() {
-  const lead = { ...fd, id: Date.now(), timestamp: new Date().toLocaleString('pt-BR') };
+async function submitLead(){
+  if(Object.values(pending).some(v=>v!==null)){setStatus('⚠️ Confirme todos os campos antes de salvar','warn');return;}
+  const lead={...fd,id:Date.now(),timestamp:new Date().toLocaleString('pt-BR'),synced:false};
   leads.push(lead);
-  localStorage.setItem('bmw_leads_v2', JSON.stringify(leads));
+  const saved=storageSet('bmw_leads_v4',leads);
+  if(!saved){leads.pop();return;}
   updateCounter();
-  document.getElementById('formView').style.display = 'none';
-  document.getElementById('successView').style.display = 'block';
-  document.getElementById('suc-nome').textContent = lead.nome;
-  document.getElementById('suc-modelo').textContent = lead.modelo;
-  document.getElementById('suc-concession').textContent = lead.concessionaria + ' · ' + lead.cidade;
+
+  // Tenta enviar para Sheets
+  const sucSync=document.getElementById('suc-sync');
+  document.getElementById('formView').style.display='none';
+  document.getElementById('successView').style.display='block';
+  document.getElementById('suc-nome').textContent=lead.nome;
+  document.getElementById('suc-modelo').textContent=lead.modelo;
+  document.getElementById('suc-concession').textContent=lead.concessionaria+' · '+lead.cidade;
+
+  if(sucSync){sucSync.className='success-sync warn';sucSync.textContent='⏳ Sincronizando com Google Sheets...';}
+
+  const result=await sendToSheets(lead);
+  if(result.ok){
+    lead.synced=true;
+    storageSet('bmw_leads_v4',leads);
+    if(sucSync){sucSync.className='success-sync ok';sucSync.textContent='✓ Salvo no Google Sheets';}
+  } else {
+    // Adiciona à fila offline
+    syncQueue.push(lead);
+    storageSet('bmw_sync_queue',syncQueue);
+    updateQueueBar();
+    if(sucSync){
+      sucSync.className='success-sync warn';
+      sucSync.textContent=result.offline
+        ?'⚠️ Sem internet — salvo localmente, enviará ao reconectar'
+        :'⚠️ Erro no envio — salvo localmente, tente exportar CSV';
+    }
+  }
 }
 
 // ── RESET ──
-function resetForm() {
-  Object.keys(fd).forEach(k => fd[k]='');
-  const ph = {nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'};
-  ['nome','email','celular'].forEach(f => {
-    const d = document.getElementById('disp-'+f);
-    if (d) { d.textContent = ph[f]; d.className = 'field-display empty'; }
+function resetForm(){
+  Object.keys(fd).forEach(k=>fd[k]='');
+  Object.keys(pending).forEach(k=>pending[k]=null);
+  Object.keys(failCount).forEach(k=>failCount[k]=0);
+  const ph={nome:'Nome completo',email:'E-mail',celular:'Celular com DDD'};
+  ['nome','email','celular','modelo'].forEach(f=>{
+    const d=document.getElementById('disp-'+f);if(d){d.textContent=ph[f]||'';d.className='field-display empty';}
     resetMicBtn(f);
-    const tb = document.getElementById('trans-'+f);
-    if (tb) tb.classList.remove('show');
+    const tb=document.getElementById('trans-'+f);if(tb)tb.classList.remove('show');
+    hideConfirm(f);showBadge(f,null);
+    const ii=document.getElementById('inline-'+f);if(ii){ii.value='';ii.className='inline-input';}
+    const tb2=document.getElementById('type-btn-'+f);if(tb2)tb2.style.display='none';
   });
-  resetMicBtn('modelo');
-  const tm = document.getElementById('trans-modelo');
-  if (tm) tm.classList.remove('show');
-  document.querySelectorAll('.chip,.concession-item').forEach(c => c.classList.remove('selected'));
-  document.getElementById('outro-modelo').value = '';
-  document.getElementById('submitBtn').disabled = true;
+  document.querySelectorAll('.chip,.concession-item').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('outro-modelo').value='';
+  document.getElementById('submitBtn').disabled=true;
+  showProximity(false);
   setStatus('Siga os scripts e toque no microfone após cada resposta');
-  document.getElementById('successView').style.display = 'none';
-  document.getElementById('formView').style.display = 'block';
+  document.getElementById('successView').style.display='none';
+  document.getElementById('formView').style.display='block';
   window.scrollTo(0,0);
 }
 
 // ── COUNTER ──
-function updateCounter() {
-  const n = leads.length;
-  document.getElementById('counterBtn').textContent = n+(n===1?' lead':' leads');
-}
+function updateCounter(){const n=leads.length;document.getElementById('counterBtn').textContent=n+(n===1?' lead':' leads');}
 updateCounter();
+updateQueueBar();
 
 // ── LEADS VIEW ──
-function showLeads() {
-  document.getElementById('formView').style.display = 'none';
-  document.getElementById('successView').style.display = 'none';
-  document.getElementById('leadsView').style.display = 'block';
-  renderLeads();
-}
-function showForm() {
-  document.getElementById('leadsView').style.display = 'none';
-  document.getElementById('formView').style.display = 'block';
-}
-function renderLeads() {
-  const list = document.getElementById('leadsList');
-  const n = leads.length;
-  document.getElementById('leadsCount').textContent = n+(n===1?' registro':' registros');
-  if (!n) { list.innerHTML = '<div class="empty-leads">Nenhum lead ainda.<br>Volte e preencha o formulário.</div>'; return; }
-  list.innerHTML = leads.slice().reverse().map(l => `
-    <div class="lead-card">
-      <div class="lead-top"><div class="lead-name">${l.nome}</div><div class="lead-time">${l.timestamp}</div></div>
-      <div class="lead-row"><span class="lead-row-label">Email</span>${l.email}</div>
-      <div class="lead-row"><span class="lead-row-label">Cel.</span>${l.celular}</div>
-      <div class="lead-row"><span class="lead-row-label">Local</span>${l.concessionaria}</div>
-      <span class="lead-tag">${l.modelo}</span>
+function showLeads(){document.getElementById('formView').style.display='none';document.getElementById('successView').style.display='none';document.getElementById('leadsView').style.display='block';renderLeads();}
+function showForm(){document.getElementById('leadsView').style.display='none';document.getElementById('formView').style.display='block';}
+function renderLeads(){
+  const list=document.getElementById('leadsList');
+  const n=leads.length;
+  document.getElementById('leadsCount').textContent=n+(n===1?' registro':' registros');
+  if(!n){list.innerHTML='<div class="empty-leads">Nenhum lead ainda.<br>Volte e preencha o formulário.</div>';return;}
+  list.innerHTML=leads.slice().reverse().map(l=>`
+    <div class="lead-card ${l.synced?'synced':'unsynced'}">
+      <div class="lead-top"><div class="lead-name">${sanitize(l.nome)}</div><div class="lead-time">${sanitize(l.timestamp)}</div></div>
+      <div class="lead-row"><span class="lead-row-label">Email</span>${sanitize(l.email)}</div>
+      <div class="lead-row"><span class="lead-row-label">Cel.</span>${sanitize(l.celular)}</div>
+      <div class="lead-row"><span class="lead-row-label">Local</span>${sanitize(l.concessionaria)}</div>
+      <span class="lead-tag">${sanitize(l.modelo)}</span>
+      <span class="lead-sync-tag ${l.synced?'ok':'pending'}">${l.synced?'✓ Sheets':'⏳ local'}</span>
     </div>`).join('');
 }
 
 // ── EXPORT CSV ──
-function exportCSV() {
-  if (!leads.length) { alert('Nenhum lead para exportar.'); return; }
-  const headers = ['Nome Completo','E-mail','Celular','Moto de Interesse','Concessionária','Cidade','UF','Endereço','Data/Hora'];
-  const rows = leads.map(l => [l.nome,l.email,l.celular,l.modelo,l.concessionaria,l.cidade,l.uf,l.endereco,l.timestamp]);
-  const csv = [headers,...rows].map(r => r.map(c => '"'+String(c||'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const now = new Date();
-  const stamp = now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
-  a.href = url; a.download = 'BMW_Leads_'+stamp+'.csv'; a.click();
+function exportCSV(){
+  if(!leads.length){alert('Nenhum lead para exportar.');return;}
+  const headers=['Nome Completo','E-mail','Celular','Moto de Interesse','Concessionária','Cidade','UF','Endereço','Data/Hora','Sincronizado'];
+  const rows=leads.map(l=>[l.nome,l.email,l.celular,l.modelo,l.concessionaria,l.cidade,l.uf,l.endereco,l.timestamp,l.synced?'Sim':'Não']);
+  const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const now=new Date();
+  const stamp=now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+  a.href=url;a.download='BMW_Leads_'+stamp+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// Tenta reenviar fila ao abrir
+if(navigator.onLine&&syncQueue.length>0)flushQueue();
 </script>
 </body>
 </html>
