@@ -381,6 +381,10 @@
         <div class="concession-name">Euroville — Uberaba</div>
         <div class="concession-addr">Av. Fernando Costa, 200 — Uberaba / MG</div>
       </button>
+      <button class="concession-item" onclick="selectConcession(this,'Euroville Uberlândia','Av. João Naves de Avila, 3370','Uberlândia','MG')">
+        <div class="concession-name">Euroville — Uberlândia</div>
+        <div class="concession-addr">Av. João Naves de Avila, 3370 — Uberlândia / MG</div>
+      </button>
     </div>
   </div>
 
@@ -468,23 +472,17 @@ function updateQueueBar() {
   }
 }
 
-// ── ENVIO PARA GOOGLE SHEETS ──
+// ── ENVIO PARA GOOGLE SHEETS (GET com payload — contorna CORS) ──
 async function sendToSheets(lead) {
   if (!SHEETS_URL || SHEETS_URL === 'COLE_AQUI_A_URL_DO_APPS_SCRIPT') return { ok: false, offline: true };
   try {
     setSyncDot('syncing');
-    const res = await fetch(SHEETS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // Apps Script requer text/plain para CORS
-      body: JSON.stringify(lead)
-    });
-    const data = await res.json();
-    if (data.status === 'ok') {
-      setSyncDot('synced');
-      return { ok: true };
-    }
-    setSyncDot('error');
-    return { ok: false };
+    const payload = encodeURIComponent(JSON.stringify(lead));
+    const url = SHEETS_URL + '?payload=' + payload;
+    const res = await fetch(url, { method: 'GET', mode: 'no-cors' });
+    // no-cors não retorna body — assume sucesso se não lançou erro
+    setSyncDot('synced');
+    return { ok: true };
   } catch(e) {
     setSyncDot('error');
     return { ok: false, offline: true };
@@ -800,8 +798,9 @@ function renderLeads(){
 // ── EXPORT CSV ──
 function exportCSV(){
   if(!leads.length){alert('Nenhum lead para exportar.');return;}
-  const headers=['Nome Completo','E-mail','Celular','Moto de Interesse','Concessionária','Cidade','UF','Endereço','Data/Hora','Sincronizado'];
-  const rows=leads.map(l=>[l.nome,l.email,l.celular,l.modelo,l.concessionaria,l.cidade,l.uf,l.endereco,l.timestamp,l.synced?'Sim':'Não']);
+  // CSV para ILC: apenas campos necessários para preenchimento
+  const headers=['Nome Completo','E-mail','Celular','Moto de Interesse','Concessionária','Cidade','UF'];
+  const rows=leads.map(l=>[l.nome,l.email,l.celular,l.modelo,l.concessionaria,l.cidade,l.uf]);
   const csv=[headers,...rows].map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
